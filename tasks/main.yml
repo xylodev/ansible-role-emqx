@@ -1,0 +1,34 @@
+---
+- name: Create Docker volumes
+  ansible.builtin.file:
+    path: "{{ emqx_app_dir }}/{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - etc
+    - log
+    - data
+  notify: Restart EMQX
+
+- name: Run EMQX in docker container
+  community.docker.docker_container:
+    name: "{{ emqx_container_name }}"
+    state: started
+    image: "emqx/emqx:{{ emqx_version }}"
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8883:8883
+      - 8084:8084
+      - 18083:18083
+    volumes:
+      - "{{ emqx_app_dir }}/etc:/opt/emqx/etc"
+      - "{{ emqx_app_dir }}/log:/opt/emqx/log"
+      - "{{ emqx_app_dir }}/data:/opt/emqx/data"

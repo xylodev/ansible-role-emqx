@@ -1,0 +1,4 @@
+---
+emqx_version: latest
+emqx_container_name: emqx
+emqx_app_dir: /opt/emqx
