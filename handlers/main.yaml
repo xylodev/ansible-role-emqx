@@ -1,0 +1,5 @@
+---
+- name: Restart EMQX
+  community.docker.docker_container:
+    name: "{{ emqx_container_name }}"
+    restart: true
